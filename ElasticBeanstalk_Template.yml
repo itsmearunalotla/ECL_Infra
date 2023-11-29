@@ -1,0 +1,206 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "This AWS CloudFormation template (CFT) deploy an
+Elastic Beanstalk application behind an Elastic Load Balancer (ELB) and an Auto
+Scaling Group (ASG). The ASG have scaling policies based on CPU utilization
+to ensure the application can handle varying loads."
+
+Parameters:
+  AppEnvironment:
+    Type: String
+    Default: pilotenv
+    Description: The environment for the Elastic Beanstalk application.
+  EC2InstanceType: 
+    Type: String
+    Default: t2.medium
+    Description: The instance type for the EC2 instances in the Auto Scaling Group.
+  AccountVpc:
+    Type: AWS::EC2::VPC::Id
+    
+    Default: vpc-id
+    Description: The VPC where the resources will be created.
+  EC2Subnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: The subnet where the EC2 instances will be launched.
+   
+  LoadBalancerSubnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: The subnet where the Elastic Load Balancer (ELB) will be deployed.
+    
+  LoadBalancerVisibility:
+    Type: String
+    Default: public
+    Description: The visibility of the Elastic Load Balancer (public or internal).
+
+Resources:
+  CloudWatchLogsRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: IAM role for CloudWatch Logs
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ["ec2.amazonaws.com"]
+            Action: ["sts:AssumeRole"]
+      Policies:
+        - PolicyName: beanstalk-full
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  [
+                    "acm:Describe*",
+                    "acm:List*",
+                    "autoscaling-plans:*",
+                    "autoscaling:Describe*",
+                    "cloudformation:Describe*",
+                    "cloudformation:Estimate*",
+                    "cloudformation:Get*",
+                    "cloudformation:List*",
+                    "cloudformation:Validate*",
+                    "cloudtrail:LookupEvents",
+                    "cloudwatch:DescribeAlarms",
+                    "cloudwatch:GetMetricStatistics",
+                    "cloudwatch:ListMetrics",
+                    "ec2:AllocateAddress",
+                    "ec2:AssociateAddress",
+                    "ec2:AuthorizeSecurityGroup*",
+                    "ec2:CreateLaunchTemplate*",
+                    "ec2:CreateSecurityGroup",
+                    "ec2:CreateTags",
+                    "ec2:DeleteLaunchTemplate*",
+                    "ec2:DeleteSecurityGroup",
+                    "ec2:DeleteTags",
+                    "ec2:Describe*",
+                    "ec2:DisassociateAddress",
+                    "ec2:ReleaseAddress",
+                    "ec2:RevokeSecurityGroup*",
+                    "elasticbeanstalk:*",
+                    "elasticloadbalancing:Describe*",
+                    "iam:GetRole",
+                    "iam:ListAttachedRolePolicies",
+                    "iam:ListInstanceProfiles",
+                    "iam:ListRolePolicies",
+                    "iam:ListRoles",
+                    "iam:ListServerCertificates",
+                    "logs:Describe*",
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:GetLogEvents",
+                    "logs:PutLogEvents",
+                    "logs:DescribeLogGroups",
+                    "logs:DescribeLogStreams",
+                    "logs:FilterLogEvents",
+                    "logs:PutRetentionPolicy",
+                    "s3:ListAllMyBuckets",
+                  ]
+                Resource: "*"
+
+  InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      InstanceProfileName: !Sub ${App}-${AppEnvironment}-CloudWatch
+      Roles:
+        - !Ref CloudWatchLogsRole
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/elasticbeanstalk/${App}-${AppEnvironment}/var/log/eb-nodejs-app/stdouterr.log
+      RetentionInDays: 7
+
+  App:
+    Type: "AWS::ElasticBeanstalk::Application"
+    Properties:
+      ApplicationName: nodejs-app
+      Description: This is nodejs Application.
+  
+  AppVersion:
+    Type: "AWS::ElasticBeanstalk::ApplicationVersion"
+    Properties:
+      ApplicationName: !Ref App
+      Description: String
+      SourceBundle:
+        S3Bucket: demo-eb-test  
+        S3Key: nodejs.zip
+
+  AppEnvironment1:
+    Type: "AWS::ElasticBeanstalk::Environment"
+    Properties:
+      EnvironmentName: !Sub ${App}-${AppEnvironment}
+      ApplicationName: !Ref App
+      SolutionStackName: "64bit Amazon Linux 2 v3.3.6 running Node.js 14"
+      Tier:
+        Name: WebServer
+        Type: Standard
+        Version: "1.0"
+      
+      OptionSettings: 
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: APP_ENV
+          Value: !Ref AppEnvironment
+        - Namespace: aws:elasticbeanstalk:command
+          OptionName: DeploymentPolicy
+          Value: RollingWithAdditionalBatch
+        - Namespace: aws:elasticbeanstalk:command
+          OptionName: BatchSizeType
+          Value: Fixed
+        - Namespace: aws:elasticbeanstalk:command
+          OptionName: BatchSize
+          Value: 1
+        - Namespace: aws:ec2:vpc
+          OptionName: VPCId
+          Value: !Ref AccountVpc
+        - Namespace: aws:ec2:vpc
+          OptionName: Subnets
+          Value: !Ref EC2Subnet
+        - Namespace: "aws:autoscaling:launchconfiguration"
+          OptionName: InstanceType
+          Value: !Ref EC2InstanceType
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: EnvironmentType
+          Value: LoadBalanced
+        - Namespace: "aws:elasticbeanstalk:environment"
+          OptionName: LoadBalancerType
+          Value: network
+        - Namespace: "aws:ec2:vpc"
+          OptionName: ELBSubnets
+          Value: !Ref LoadBalancerSubnet
+        - Namespace: "aws:ec2:vpc"
+          OptionName: ELBScheme
+          Value: !Sub ${LoadBalancerVisibility}
+        - Namespace: "aws:autoscaling:launchconfiguration"
+          OptionName: IamInstanceProfile
+          Value: !Ref InstanceProfile
+        - Namespace: aws:elasticbeanstalk:cloudwatch:logs
+          OptionName: StreamLogs
+          Value: true
+        - Namespace: "aws:autoscaling:asg"
+          OptionName: MinSize
+          Value: 2
+        - Namespace: "aws:autoscaling:asg"
+          OptionName: MaxSize
+          Value: 4   
+        - Namespace: "aws:autoscaling:trigger"
+          OptionName: UpperThreshold
+          Value: "80"
+        - Namespace: "aws:autoscaling:trigger"
+          OptionName: BreachDuration
+          Value: "5"
+        - Namespace: "aws:autoscaling:trigger"
+          OptionName: UpperBreachScaleIncrement
+          Value: "1"
+        - Namespace: "aws:autoscaling:trigger"
+          OptionName: LowerThreshold
+          Value: "30"
+        - Namespace: "aws:autoscaling:trigger"
+          OptionName: LowerBreachScaleIncrement
+          Value: "-1"
+        - Namespace: aws:autoscaling:trigger
+          OptionName: MeasureName
+          Value: CPUUtilization
+        - Namespace: aws:autoscaling:trigger
+          OptionName: Unit
+          Value: Percent
