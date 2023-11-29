@@ -1,56 +1,50 @@
-Description
-This CloudFormation template automates the deployment of an Elastic Beanstalk application within an AWS environment. The architecture includes an Elastic Load Balancer (ELB) and an Auto Scaling Group (ASG) with scaling policies based on CPU utilization to ensure optimal performance under varying workloads.
+This CloudFormation template automates the deployment of a Node.js application on AWS Elastic Beanstalk, equipped with an Elastic Load Balancer (ELB) and an Auto Scaling Group (ASG). The ASG dynamically scales instances based on CPU utilization, ensuring optimal performance under varying workloads.
 
-Parameters
-AppEnvironment: (Default: pilotenv)
-The environment for the Elastic Beanstalk application.
+. Deploy the CloudFormation Stack
+Open the AWS CloudFormation Console.
+Create a new stack.
+Set parameters:
+AppEnvironment: (e.g., demo-env)
+EC2InstanceType: (e.g., t2.micro)
+AccountVpc: (Your VPC ID)
+EC2Subnet: (Your subnet ID)
+LoadBalancerSubnet: (Your subnet ID)
+LoadBalancerVisibility: (public or internal)
+2. Explore the Deployed Resources
+IAM roles for permissions.
+Elastic Beanstalk application and version.
+Auto Scaling Group for dynamic scaling.
+Elastic Load Balancer for traffic distribution.
+CloudWatch Logs for centralized logging.
+3. Observe Automatic Scaling
+Monitor the Auto Scaling Group as it dynamically adjusts instances based on CPU utilization.
+Simulate load changes to observe real-time scaling responses.
+4. Check Application Logs
+Explore CloudWatch Logs for centralized logs.
+Understand how the system handles and stores application events.
+Thought Process Behind the Architecture
+Elastic Beanstalk:
 
-EC2InstanceType: (Default: t2.medium)
-The instance type for the EC2 instances within the Auto Scaling Group.
+Simplifies deployment and management for Node.js applications.
+Auto Scaling Group (ASG):
 
-AccountVpc: (Default: vpc-004639285051f3cd7)
-The Virtual Private Cloud (VPC) where the resources will be created.
+Automatically adjusts instances to maintain performance.
+Elastic Load Balancer (ELB):
 
-EC2Subnet: (Default: subnet-0bd5312909cceefb9)
-The subnet where the EC2 instances will be launched.
+Enhances availability and fault tolerance by distributing traffic.
+IAM Roles:
 
-LoadBalancerSubnet: (Default: subnet-0a2ea4589dffaaa98)
-The subnet where the Elastic Load Balancer (ELB) will be deployed.
+Ensures secure access to AWS services.
+CloudWatch Logs:
 
-LoadBalancerVisibility: (Default: public)
-The visibility of the Elastic Load Balancer (public or internal).
+Centralizes logs for easy monitoring and analysis.
+Environment Configuration:
 
-Resources
-CloudWatchLogsRole:
-IAM role for CloudWatch Logs with specific permissions for various AWS services.
+Adaptable settings for different deployment environments.
+Scaling Policies:
 
-InstanceProfile:
-IAM instance profile associated with the CloudWatchLogsRole.
+Dynamically scales based on CPU utilization for efficient resource utilization.
+Network Configuration:
 
-LogGroup:
-AWS CloudWatch Logs log group for storing Elastic Beanstalk application logs.
+Flexible configuration aligned with specified VPC and subnet settings.
 
-App:
-Elastic Beanstalk application definition with the name "nodejs-app" and description.
-
-AppVersion:
-Elastic Beanstalk application version pointing to a specified S3 source bundle (nodejs.zip).
-
-AppEnvironment1:
-Elastic Beanstalk environment configuration with various settings:
-
-EnvironmentName: (Generated as a combination of App and AppEnvironment parameters)
-ApplicationName: (Reference to the Elastic Beanstalk application)
-SolutionStackName: "64bit Amazon Linux 2023 v6.0.3 running Node.js 18"
-Tier: WebServer - Standard (Version 1.0)
-Auto Scaling Configuration:
-
-MinSize: 2 (Minimum number of instances in the Auto Scaling Group)
-MaxSize: 4 (Maximum number of instances in the Auto Scaling Group)
-UpperThreshold: 80 (Upper CPU utilization threshold triggering scaling up)
-BreachDuration: 5 (Duration of breach for scaling actions)
-UpperBreachScaleIncrement: 1 (Number of instances to add when scaling up)
-LowerThreshold: 30 (Lower CPU utilization threshold triggering scaling down)
-LowerBreachScaleIncrement: -1 (Number of instances to remove when scaling down)
-MeasureName: "CPUUtilization" (Metric used for scaling decisions)
-Unit: "Percent" (Unit of the metric)
