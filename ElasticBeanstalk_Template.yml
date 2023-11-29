@@ -131,7 +131,7 @@ Resources:
     Properties:
       EnvironmentName: !Sub ${App}-${AppEnvironment}
       ApplicationName: !Ref App
-      SolutionStackName: "64bit Amazon Linux 2 v3.3.6 running Node.js 14"
+      SolutionStackName: "64bit Amazon Linux 2023 v6.0.3 running Node.js 18"
       Tier:
         Name: WebServer
         Type: Standard
