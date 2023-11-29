@@ -2,6 +2,7 @@ This CloudFormation template automates the deployment of a Node.js application o
 
 . Deploy the CloudFormation Stack
 Open the AWS CloudFormation Console.
+
 Create a new stack.
 Set parameters:
 AppEnvironment: (e.g., demo-env)
