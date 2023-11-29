@@ -15,15 +15,16 @@ Parameters:
     Description: The instance type for the EC2 instances in the Auto Scaling Group.
   AccountVpc:
     Type: AWS::EC2::VPC::Id
-    
-    Default: vpc-id
+    Default: vpc-004639285051f3cd7
     Description: The VPC where the resources will be created.
   EC2Subnet:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-0bd5312909cceefb9
     Description: The subnet where the EC2 instances will be launched.
    
   LoadBalancerSubnet:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-0a2ea4589dffaaa98
     Description: The subnet where the Elastic Load Balancer (ELB) will be deployed.
     
   LoadBalancerVisibility:
