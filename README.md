@@ -1,6 +1,6 @@
 This CloudFormation template automates the deployment of a Node.js application on AWS Elastic Beanstalk, equipped with an Elastic Load Balancer (ELB) and an Auto Scaling Group (ASG). The ASG dynamically scales instances based on CPU utilization, ensuring optimal performance under varying workloads.
 
-. Deploy the CloudFormation Stack
+1. Deploy the CloudFormation Stack
 Open the AWS CloudFormation Console.
 
 Create a new stack.
@@ -11,21 +11,24 @@ AccountVpc: (Your VPC ID)
 EC2Subnet: (Your subnet ID)
 LoadBalancerSubnet: (Your subnet ID)
 LoadBalancerVisibility: (public or internal)
+
+
 2. Explore the Deployed Resources
 IAM roles for permissions.
-Elastic Beanstalk application and version.
+3. Elastic Beanstalk application and version.
 Auto Scaling Group for dynamic scaling.
 Elastic Load Balancer for traffic distribution.
 CloudWatch Logs for centralized logging.
-3. Observe Automatic Scaling
+
+4. Observe Automatic Scaling
 Monitor the Auto Scaling Group as it dynamically adjusts instances based on CPU utilization.
 Simulate load changes to observe real-time scaling responses.
-4. Check Application Logs
+
+6. Check Application Logs
 Explore CloudWatch Logs for centralized logs.
 Understand how the system handles and stores application events.
 Thought Process Behind the Architecture
 Elastic Beanstalk:
-
 Simplifies deployment and management for Node.js applications.
 Auto Scaling Group (ASG):
 
