@@ -52,3 +52,10 @@ Network Configuration:
 
 Flexible configuration aligned with specified VPC and subnet settings.
 
+**From the local i have executed this command**
+
+aws cloudformation create-stack \
+--stack-name mcf_ebs \
+--template-body file://c/Users/ADMIN/Desktop/AWS/ECL_Infra/ElasticBeanstalk_Template.yml\
+--parameters ParameterKey=AppEnvironment,ParameterValue=pilotenv \
+--capabilities CAPABILITY_NAMED_IAM
