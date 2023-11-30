@@ -108,8 +108,8 @@ Resources:
   App:
     Type: "AWS::ElasticBeanstalk::Application"
     Properties:
-      ApplicationName: angularjs-app
-      Description: This is angular Application.
+      ApplicationName: java-app
+      Description: This is java Application.
   
   AppVersion:
     Type: "AWS::ElasticBeanstalk::ApplicationVersion"
@@ -118,14 +118,14 @@ Resources:
       Description: String
       SourceBundle:
         S3Bucket: demo-eb-test  
-        S3Key: myangular.zip
+        S3Key: java.zip
 
   AppEnvironment1:
     Type: "AWS::ElasticBeanstalk::Environment"
     Properties:
       EnvironmentName: !Sub ${App}-${AppEnvironment}
       ApplicationName: !Ref App
-      SolutionStackName: "64bit Amazon Linux 2023 v6.0.3 running Node.js 18"
+      SolutionStackName: "64bit Amazon Linux 2023 v5.1.1 running Tomcat 10 Corretto 17"
       Tier:
         Name: WebServer
         Type: Standard
