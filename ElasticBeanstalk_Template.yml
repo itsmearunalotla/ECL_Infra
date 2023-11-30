@@ -108,8 +108,8 @@ Resources:
   App:
     Type: "AWS::ElasticBeanstalk::Application"
     Properties:
-      ApplicationName: nodejs-app
-      Description: This is nodejs Application.
+      ApplicationName: angularjs-app
+      Description: This is angular Application.
   
   AppVersion:
     Type: "AWS::ElasticBeanstalk::ApplicationVersion"
@@ -118,7 +118,7 @@ Resources:
       Description: String
       SourceBundle:
         S3Bucket: demo-eb-test  
-        S3Key: nodejs.zip
+        S3Key: myangular.zip
 
   AppEnvironment1:
     Type: "AWS::ElasticBeanstalk::Environment"
