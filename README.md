@@ -59,3 +59,6 @@ aws cloudformation create-stack \
 --template-body file://c/Users/ADMIN/Desktop/AWS/ECL_Infra/ElasticBeanstalk_Template.yml\
 --parameters ParameterKey=AppEnvironment,ParameterValue=pilotenv \
 --capabilities CAPABILITY_NAMED_IAM
+
+ 
+ it will create the specified resources in AWS, including the Elastic Beanstalk application, environment, associated IAM roles, CloudWatch Logs, and Auto Scaling Group. The application will be deployed with the defined settings, and the environment can dynamically scale based on CPU utilization, ensuring optimal performance under varying loads.
