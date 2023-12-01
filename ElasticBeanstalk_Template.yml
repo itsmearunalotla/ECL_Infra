@@ -13,12 +13,19 @@ Parameters:
     Type: String
     Default: t2.medium
     Description: The instance type for the EC2 instances in the Auto Scaling Group.
-  VPC:
+  AccountVpc:
     Type: AWS::EC2::VPC::Id
+    Default: vpc-004639285051f3cd7
+    Description: The VPC where the resources will be created.
   EC2Subnet:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-0bd5312909cceefb9
+    Description: The subnet where the EC2 instances will be launched.
+   
   LoadBalancerSubnet:
     Type: AWS::EC2::Subnet::Id
+    Default: subnet-0a2ea4589dffaaa98
+    Description: The subnet where the Elastic Load Balancer (ELB) will be deployed.
     
   LoadBalancerVisibility:
     Type: String
@@ -108,8 +115,8 @@ Resources:
   App:
     Type: "AWS::ElasticBeanstalk::Application"
     Properties:
-      ApplicationName: java-app
-      Description: This is java Application.
+      ApplicationName: nodejs-app
+      Description: This is nodejs Application.
   
   AppVersion:
     Type: "AWS::ElasticBeanstalk::ApplicationVersion"
@@ -118,14 +125,14 @@ Resources:
       Description: String
       SourceBundle:
         S3Bucket: demo-eb-test  
-        S3Key: java.zip
+        S3Key: nodejs.zip
 
   AppEnvironment1:
     Type: "AWS::ElasticBeanstalk::Environment"
     Properties:
       EnvironmentName: !Sub ${App}-${AppEnvironment}
       ApplicationName: !Ref App
-      SolutionStackName: "64bit Amazon Linux 2023 v5.1.1 running Tomcat 10 Corretto 17"
+      SolutionStackName: "64bit Amazon Linux 2023 v6.0.3 running Node.js 18"
       Tier:
         Name: WebServer
         Type: Standard
@@ -146,7 +153,7 @@ Resources:
           Value: 1
         - Namespace: aws:ec2:vpc
           OptionName: VPCId
-          Value: !Ref VPC
+          Value: !Ref AccountVpc
         - Namespace: aws:ec2:vpc
           OptionName: Subnets
           Value: !Ref EC2Subnet
